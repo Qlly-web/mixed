@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+		<title></title>
+		<style type="text/css">
+			.parent {
+				height: 300px;
+				width: 500px;
+				margin: 0px auto;
+				font-size: 0px;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.child {
+				height: 100%;
+				width: 100%;
+				white-space: nowrap;
+				position: absolute;
+			}
+
+			.child-item {
+				height: 100%;
+				width: 100%;
+				display: inline-block;
+				font-size: 14px;
+				padding: 10px;
+				box-sizing: border-box;
+			}
+
+			.child1 {
+				background-color: blue;
+			}
+
+			.child2 {
+				background-color: green;
+			}
+
+			.child3 {
+				background-color: red;
+			}
+		</style>
+	</head>
+	<body>
+		<div class="parent">
+			<div class="child">
+				<div class="child-item child1">1</div>
+				<div class="child-item child2">2</div>
+				<div class="child-item child3">3</div>
+			</div>
+		</div>
+		<div style="width:166px;margin: 20px auto;">
+			<button id="pre">上一张</button>
+			<button id="next">下一张</button>
+		</div>
+	</body>
+	<script type="text/javascript">
+		(function() {
+			var child = document.querySelector(".child");
+			var total = child.childElementCount;
+			var index = -1;
+			var firstElementChild = child.firstElementChild;
+			var lastElementChild = child.lastElementChild;
+			var width = getComputedStyle(child, null).width;
+			var switch_t = 0.33;
+			var back = false;
+			var tran_config = "s";
+			var auto_play = false;
+			var play_interval = 3 > switch_t ? 3 : switch_t + 200; // 不允许小于动画时间
+			width = +width.match(/\d+/g)[0];
+			child.prepend(lastElementChild.cloneNode(true)); // 必须要clone，因为是对象，直接添加只会移动位置
+			child.append(firstElementChild.cloneNode(true)); // 设置为true，深拷贝，复制div里面的元素
+			child.style.left = index * width + "px";
+			child.style.transition = switch_t + "s";
+			var pre_el = document.querySelector("#pre");
+			var next_el = document.querySelector("#next");
+			pre_el.addEventListener("click", function() {
+				if (back) {
+					back = false;
+					child.style.transition = switch_t + tran_config
+				}
+				child.style.left = (++index) * width + "px";
+				if (index == 0) {
+					setTimeout(_ => {
+						back = true;
+						child.style.transition = 0 + tran_config;
+						index = -total;
+						child.style.left = index * width + "px";
+					}, switch_t * 1000)
+				}
+			})
+			next_el.addEventListener("click", function() {
+				if (back) {
+					back = false;
+					child.style.transition = switch_t + tran_config
+				}
+				child.style.left = (--index) * width + "px";
+				if (index == -(total + 1)) {
+					setTimeout(_ => {
+						back = true;
+						child.style.transition = 0 + tran_config;
+						index = -1;
+						child.style.left = index * width + "px";
+					}, switch_t * 1000)
+				}
+			})
+			if (auto_play) {
+				setInterval(function() {
+					next_el.click();
+				}, play_interval * 1000)
+			}
+		})()
+	</script>
+</html>
